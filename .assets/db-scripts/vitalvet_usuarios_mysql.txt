@@ -1,0 +1,111 @@
+CREATE DATABASE IF NOT EXISTS vitalvet_usuarios;
+USE vitalvet_usuarios;
+
+-- ============================================================================
+-- TABLAS DEL DOMINIO: USUARIOS Y PERSONAL 
+-- ============================================================================
+
+CREATE TABLE persona (
+    id_persona BIGINT AUTO_INCREMENT NOT NULL,
+    codigo_persona VARCHAR(20) NOT NULL, -- Código de negocio (Ej: CLI-2026-001)
+    nombres VARCHAR(100) NOT NULL,
+    apellidos VARCHAR(100) NOT NULL,
+    dni VARCHAR(20) NOT NULL, 
+    celular VARCHAR(15),
+    foto_url VARCHAR(255),
+    genero ENUM('MASCULINO', 'FEMENINO', 'NO_ESPECIFICADO') DEFAULT 'NO_ESPECIFICADO',
+    rol ENUM('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE') NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (id_persona),
+    UNIQUE KEY uq_persona_dni (dni),
+    UNIQUE KEY uq_persona_codigo (codigo_persona)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE usuario (
+    id_usuario BIGINT AUTO_INCREMENT NOT NULL,
+    id_persona BIGINT NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    contrasenia VARCHAR(255) NOT NULL,
+    token_recuperacion VARCHAR(255) NULL,
+    fecha_expiracion_token TIMESTAMP NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_usuario),
+    UNIQUE KEY uq_usuario_persona (id_persona),
+    UNIQUE KEY uq_usuario_email (email),
+    CONSTRAINT fk_usuario_persona FOREIGN KEY (id_persona) REFERENCES persona (id_persona) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE especialidad (
+    id_especialidad BIGINT AUTO_INCREMENT NOT NULL,
+    nombre_especialidad VARCHAR(100) NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (id_especialidad),
+    UNIQUE KEY uq_especialidad_nombre (nombre_especialidad)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE veterinario (
+    id_veterinario BIGINT AUTO_INCREMENT NOT NULL,
+    id_persona BIGINT NOT NULL,
+    id_especialidad BIGINT NOT NULL,
+    num_colegiatura VARCHAR(20) NOT NULL,
+    PRIMARY KEY (id_veterinario),
+    UNIQUE KEY uq_vet_persona (id_persona),
+    UNIQUE KEY uq_vet_colegiatura (num_colegiatura),
+    CONSTRAINT fk_vet_especialidad FOREIGN KEY (id_especialidad) REFERENCES especialidad (id_especialidad) ON DELETE RESTRICT,
+    CONSTRAINT fk_vet_persona FOREIGN KEY (id_persona) REFERENCES persona (id_persona) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- ÍNDICES DE OPTIMIZACIÓN
+-- ============================================================================
+CREATE INDEX idx_usuario_fecha ON usuario(fecha_creacion);
+CREATE INDEX idx_persona_rol ON persona(rol);
+CREATE INDEX idx_persona_codigo ON persona(codigo_persona);
+
+
+-- ============================================================================
+-- DATA DEMO / INSERTS DE PRUEBA
+-- ============================================================================
+
+-- 1. Registro de Especialidades (Requerido para el rol Veterinario)
+INSERT INTO especialidad (nombre_especialidad, activo) 
+VALUES ('Cirugía de Mascotas', TRUE);
+
+-- 2. Registro de Datos Personales (Tabla persona)
+-- Usuario 1: Administrador (Óscar Iván)
+INSERT INTO persona (codigo_persona, nombres, apellidos, dni, celular, foto_url, genero, rol, activo)
+VALUES ('ADM-2026-001', 'Oscar Ivan', 'Gonzales Purizaca', '78954415', '988512254', 'https://res.cloudinary.com/dfid8iuf3/image/upload/v1771809505/jqj6icolc2l13alwcoi3.jpg', 'MASCULINO', 'ADMINISTRADOR', TRUE);
+
+-- Usuario 2: Veterinario (Ana María)
+INSERT INTO persona (codigo_persona, nombres, apellidos, dni, celular, foto_url, genero, rol, activo)
+VALUES ('VET-2026-001', 'Ana Maria', 'Gomez Flores', '45871236', '941258763', 'https://res.cloudinary.com/dfid8iuf3/image/upload/v1777320913/pgzs7yor2izqr4oo0rvz.jpg', 'FEMENINO', 'VETERINARIO', TRUE);
+
+-- Usuario 3: Cliente (Jorge Luis)
+INSERT INTO persona (codigo_persona, nombres, apellidos, dni, celular, foto_url, genero, rol, activo)
+VALUES ('CLI-2026-001', 'Jorge Luis', 'Perez Castro', '12457896', '963258741', 'https://res.cloudinary.com/dfid8iuf3/image/upload/v1771788276/napprliapuxtwmchwek4.jpg', 'MASCULINO', 'CLIENTE', TRUE);
+
+-- 3. Registro de Perfiles Profesionales (Tabla veterinario)
+-- Enlazamos a Ana Maria (id_persona = 2) con la especialidad creada (id_especialidad = 1)
+INSERT INTO veterinario (id_persona, id_especialidad, num_colegiatura)
+VALUES (2, 1, 'CMP 84920');
+
+-- 4. Registro de Credenciales de Acceso (Tabla usuario)
+-- Nota: Campos token y fecha_expiracion quedan inicialmente en NULL de manera automática
+
+-- Cuenta para el Administrador (Óscar Iván) -> id_persona = 1
+INSERT INTO usuario (id_persona, email, contrasenia)
+VALUES (1, 'ivangonzalespurizaca@gmail.com', '$2a$10$onmA2yAqqwMDTQX9RHoUBuxvxGkTDIdqe/fhZlwpMHRb4c3DfKCRK'); -- admin123
+
+-- Cuenta para la Veterinaria (Ana María) -> id_persona = 2
+INSERT INTO usuario (id_persona, email, contrasenia)
+VALUES (2, 'ana.gomez@vitalvet.com', '$2a$10$zR7RarWwiu/Rd49O04GOEOwjpQK/B4Kk7L9Jr2BY/9fYsf4/y9uG.'); -- vet123
+
+-- Cuenta para el Cliente (Jorge Luis) -> id_persona = 3
+INSERT INTO usuario (id_persona, email, contrasenia)
+VALUES (3, 'jorge.perez@gmail.com', '$2a$10$I1Vp.2y2XqXSOaO/llDuAuVfBx4JKIr2Y8P2kP6CKlp5P5hyV60xa'); -- cliente123
+
+
+-- ============================================================================
+-- VERIFICACIÓN FINAL
+-- ============================================================================
+SELECT * FROM usuario;

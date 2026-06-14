@@ -1,0 +1,151 @@
+CREATE SCHEMA IF NOT EXISTS pacientes;
+
+-- ============================================================================
+-- TIPOS ENUM NATIVOS (Exclusivos de PostgreSQL)
+-- ============================================================================
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_sexo_mascota') THEN
+        CREATE TYPE pacientes.tipo_sexo_mascota AS ENUM ('MACHO', 'HEMBRA');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_estado_vacuna') THEN
+        CREATE TYPE pacientes.tipo_estado_vacuna AS ENUM ('APLICADA', 'PROGRAMADA', 'VENCIDA');
+    END IF;
+END $$;
+
+-- ============================================================================
+-- TABLAS DEL DOMINIO: PACIENTES Y HISTORIAL CLÍNICO
+-- ============================================================================
+
+CREATE TABLE pacientes.especie (
+    id_especie BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre_especie VARCHAR(50) NOT NULL UNIQUE,
+    activo BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE pacientes.raza (
+    id_raza BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_especie BIGINT NOT NULL,
+    nombre_raza VARCHAR(100) NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_raza_especie FOREIGN KEY (id_especie) REFERENCES pacientes.especie(id_especie) ON DELETE RESTRICT,
+    CONSTRAINT uq_especie_raza UNIQUE (id_especie, nombre_raza)
+);
+
+CREATE TABLE pacientes.mascota (
+    id_mascota BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    codigo_mascota VARCHAR(20) NOT NULL UNIQUE,
+    id_cliente BIGINT NOT NULL,
+    nombre_mascota VARCHAR(255) NOT NULL,
+    id_raza BIGINT NOT NULL,
+    sexo pacientes.tipo_sexo_mascota NOT NULL,
+    fecha_nacimiento DATE,
+    peso_actual DECIMAL(5, 2) DEFAULT 0.00,
+    foto_url VARCHAR(255),
+    activo BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_mascota_raza FOREIGN KEY (id_raza) REFERENCES pacientes.raza(id_raza) ON DELETE RESTRICT
+);
+
+CREATE TABLE pacientes.consulta (
+    id_consulta BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_cita BIGINT NOT NULL UNIQUE,   -- ID lógico crítico (Apunta al Microservicio de Agenda)
+    id_veterinario BIGINT NOT NULL,    
+    peso_actual DECIMAL(5,2),
+    temperatura DECIMAL(4,2),
+    diagnostico TEXT NOT NULL,
+    recomendaciones TEXT
+);
+
+CREATE TABLE pacientes.vacuna (
+    id_vacuna BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre_vacuna VARCHAR(100) NOT NULL UNIQUE,
+    descripcion TEXT,
+    activo BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE pacientes.vacuna_aplicada (
+    id_aplicacion BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_mascota BIGINT NOT NULL,
+    id_vacuna BIGINT NOT NULL,
+    id_consulta BIGINT,
+    fecha_aplicacion DATE,
+    proxima_dosis DATE,
+    nro_dosis VARCHAR(50) DEFAULT '1ra Dosis',
+    estado pacientes.tipo_estado_vacuna DEFAULT 'APLICADA',
+    CONSTRAINT fk_vacuna_mascota FOREIGN KEY (id_mascota) REFERENCES pacientes.mascota(id_mascota) ON DELETE CASCADE,
+    CONSTRAINT fk_vacuna_catalogo FOREIGN KEY (id_vacuna) REFERENCES pacientes.vacuna(id_vacuna) ON DELETE RESTRICT,
+    CONSTRAINT fk_vacuna_consulta FOREIGN KEY (id_consulta) REFERENCES pacientes.consulta(id_consulta) ON DELETE SET NULL
+);
+
+-- ============================================================================
+-- ÍNDICES DE OPTIMIZACIÓN (Indispensables para API Composition)
+-- ============================================================================
+CREATE INDEX idx_mascota_cliente ON pacientes.mascota(id_cliente);
+CREATE INDEX idx_mascota_codigo ON pacientes.mascota(codigo_mascota);
+CREATE INDEX idx_vacuna_mascota ON pacientes.vacuna_aplicada(id_mascota);
+CREATE INDEX idx_consulta_cita ON pacientes.consulta(id_cita); 
+
+-- ============================================================================
+-- DATA SEED: POBLADO DE TABLAS MAESTRAS (MICROSERVICIO PACIENTES)
+-- ============================================================================
+
+-- 1. REGISTRO DE ESPECIES ANIMALES BASE
+INSERT INTO pacientes.especie (nombre_especie, activo) VALUES
+('Canino (Perro)', true),
+('Felino (Gato)', true),
+('Ave', true),
+('Roedor', true)
+ON CONFLICT (nombre_especie) DO NOTHING;
+
+
+-- 2. REGISTRO DE RAZAS ASOCIADAS A SUS RESPECTIVAS ESPECIES
+-- (id_especie 1 = Canino, id_especie 2 = Felino)
+INSERT INTO pacientes.raza (id_especie, nombre_raza, activo) VALUES
+-- Razas de Perros
+(1, 'Labrador Retriever', true),
+(1, 'Pastor Alemán', true),
+(1, 'Golden Retriever', true),
+(1, 'Chihuahua', true),
+(1, 'Bulldog Francés', true),
+(1, 'Pug', true),
+(1, 'Boxer', true),
+(1, 'Snauser', true),
+(1, 'Sin Raza / Mestizo (Perro)', true),
+
+-- Razas de Gatos
+(2, 'Persa', true),
+(2, 'Siamés', true),
+(2, 'Maine Coon', true),
+(2, 'Bengala', true),
+(2, 'Angora', true),
+(2, 'Sin Raza / Mestizo (Gato)', true),
+
+-- Razas de Aves y Roedores
+(3, 'Periquito Australiano', true),
+(3, 'Canario', true),
+(4, 'Hámster Ruso', true),
+(4, 'Cobaya / Cuy', true)
+ON CONFLICT (id_especie, nombre_raza) DO NOTHING;
+
+
+-- 3. REGISTRO DEL CATÁLOGO BASE DE VACUNAS VETERINARIAS
+INSERT INTO pacientes.vacuna (nombre_vacuna, descripcion, activo) VALUES
+-- Vacunas de Caninos
+('Quíntuple Canina', 'Protege contra Parvovirus, Distemper (Moquillo), Hepatitis, Leptospirosis y Parainfluenza.', true),
+('Sextuple Canina', 'Refuerzo avanzado que incluye protección contra Coronavirus canino.', true),
+('Antirrábica', 'Vacuna obligatoria anual contra el virus de la Rabia para caninos y felinos.', true),
+('Triple Felina', 'Protege contra la Panleucopenia, Calicivirus y Rinotraqueitis Viral Felina.', true),
+('Leucemia Felina', 'Protege contra el virus de la Leucemia Felina (FeLV), altamente recomendado para gatos con acceso al exterior.', true)
+ON CONFLICT (nombre_vacuna) DO NOTHING;
+
+
+-- ============================================================================
+-- DATA SEED: REGISTROS DE PRUEBA OPERACIONALES (Mascotas y Consultas iniciales)
+-- ============================================================================
+
+-- 4. REGISTRO DE MASCOTAS DE PRUEBA
+-- Nota: id_cliente apunta lógicamente al idPersona '4' (o superiores) creados en tu microservicio de usuarios.
+INSERT INTO pacientes.mascota (codigo_mascota, id_cliente, nombre_mascota, id_raza, sexo, fecha_nacimiento, peso_actual, foto_url, activo) VALUES
+('MAS-100001', 4, 'Firulais', 1, 'MACHO'::pacientes.tipo_sexo_mascota, '2024-03-15', 25.50, 'https://images.unsplash.com/photo-1543466835-00a7907e9de1', true),
+('MAS-100002', 4, 'Luna', 10, 'HEMBRA'::pacientes.tipo_sexo_mascota, '2025-01-10', 4.20, 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba', true)
+ON CONFLICT (codigo_mascota) DO NOTHING;

@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            # =========================
+            # AUTH SERVICE
+            # =========================
+            - id: MICRO-USUARIO-PUBLIC
+              uri: lb://MICRO-USUARIO
+              predicates:
+                - Path=/api/usuario/auth/**
+
+            - id: MICRO-USUARIO-PRIVATE
+              uri: lb://MICRO-USUARIO
+              predicates:
+                - Path=/api/usuario/**
+              filters:
+                - AuthenticationFilter
+
+            # =========================
+            # PACIENTE SERVICE
+            # =========================
+            - id: MICRO-PACIENTE-PUBLIC
+              uri: lb://MICRO-PACIENTE
+              predicates:
+                - Path=/api/paciente/mascota/public/**
+
+            - id: MICRO-PACIENTE-PRIVATE
+              uri: lb://MICRO-PACIENTE
+              predicates:
+                - Path=/api/paciente/**
+              filters:
+                - AuthenticationFilter
+
+server:
+  port: 8091
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    hostname: localhost

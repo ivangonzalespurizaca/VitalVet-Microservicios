@@ -1,6 +1,22 @@
+app:
+  jwt:
+    secret: emrYvkqZeg78wQ4cTzPUrP4VmzX13AF8bxc9lqdeFs2
+
 server:
   port: 8092
+
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: clinsantar@gmail.com
+    password: ihfbciddbduvltve
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   jpa:
     database: MYSQL
     hibernate:
@@ -18,6 +34,7 @@ spring:
 eureka:
   instance:
     hostname: localhost
+    prefer-ip-address: true
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/

@@ -1,0 +1,182 @@
+{
+  "info": {
+    "_postman_id": "9993f872-8656-43b7-838d-dcf0b5af6c4e",
+    "name": "VitalVet-Microservicios",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50464538",
+    "_collection_link": "https://go.postman.co/collection/50464538-9993f872-8656-43b7-838d-dcf0b5af6c4e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "usuarios",
+      "item": [
+        {
+          "name": "Iniciar Sesion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var respuesta = pm.response.json();\r",
+                  "\r",
+                  "if (respuesta.success && respuesta.data && respuesta.data.token) {\r",
+                  "    pm.environment.set(\"jwt_token\", respuesta.data.token);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "/*{\r\n    \"email\" : \"jorge.perez@gmail.com\",\r\n    \"contrasenia\" : \"cliente123\"\r\n}*/\r\n{\r\n    \"email\" : \"ivangonzalespurizaca@gmail.com\",\r\n    \"contrasenia\" : \"admin123\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8091/api/usuario/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8091",
+              "path": [
+                "api",
+                "usuario",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar Cliente",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"oscar@gmail.com\",\r\n  \"contrasenia\": \"cliente123\",\r\n  \"nombres\": \"Oscar Ivan\",\r\n  \"apellidos\": \"Mendoza Ruiz\",\r\n  \"dni\": \"56325412\",\r\n  \"celular\": \"987654321\",\r\n  \"genero\": \"MASCULINO\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8091/api/usuario/auth/registrar/cliente",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8091",
+              "path": [
+                "api",
+                "usuario",
+                "auth",
+                "registrar",
+                "cliente"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recuperar Contraseña",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar Contraseña",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Pacientes",
+      "item": [
+        {
+          "name": "Registrar Mascota (Privado)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombreMascota\": \"Firulais\",\r\n  \"idRaza\": 1,\r\n  \"sexo\": \"MACHO\",\r\n  \"fechaNacimiento\": \"2024-03-15\",\r\n  \"idCliente\": 4,\r\n  \"pesoActual\": \"25.0\",\r\n  \"fotoUrl\": \"https://res.cloudinary.com/dfid8iuf3/image/upload/v1777487085/Beagle-1_g7rnpp.webp\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8093/api/pacientes/mascota/registrar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8093",
+              "path": [
+                "api",
+                "pacientes",
+                "mascota",
+                "registrar"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar Mascota (Publico)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"nombreMascota\": \"Firulais\",\r\n  \"idRaza\": 1,\r\n  \"sexo\": \"MACHO\",\r\n  \"fechaNacimiento\": \"2024-03-15\",\r\n  \"idCliente\": 4,\r\n  \"pesoActual\": \"25.0\",\r\n  \"fotoUrl\": \"https://res.cloudinary.com/dfid8iuf3/image/upload/v1777487085/Beagle-1_g7rnpp.webp\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8093/api/pacientes/mascota/registrar",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8093",
+              "path": [
+                "api",
+                "pacientes",
+                "mascota",
+                "registrar"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

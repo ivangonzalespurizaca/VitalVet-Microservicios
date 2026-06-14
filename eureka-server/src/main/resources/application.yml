@@ -3,6 +3,7 @@ server:
 spring:
   application:
     name: eureka-server
+    prefer-ip-address: true
 eureka:
   instance:
     hostname: localhost
@@ -10,4 +11,4 @@ eureka:
     fetch-registry: false
     register-with-eureka: false
     service-url:
-        defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/

@@ -1,0 +1,76 @@
+CREATE SCHEMA IF NOT EXISTS agenda;
+
+-- ============================================================================
+-- TIPOS ENUM NATIVOS (Exclusivos de PostgreSQL)
+-- ============================================================================
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_dia_semana') THEN
+        CREATE TYPE agenda.tipo_dia_semana AS ENUM ('LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_estado_cita') THEN
+        CREATE TYPE agenda.tipo_estado_cita AS ENUM ('PENDIENTE', 'PAGADA', 'COMPLETADA', 'CANCELADA', 'VENCIDA');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_comprobante') THEN
+        CREATE TYPE agenda.tipo_comprobante AS ENUM ('BOLETA', 'FACTURA', 'RECIBO_INTERNO');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'tipo_metodo_pago') THEN
+        CREATE TYPE agenda.tipo_metodo_pago AS ENUM ('EFECTIVO', 'TARJETA_CREDITO', 'TARJETA_DEBITO', 'TRANSFERENCIA', 'YAPE_PLIN');
+    END IF;
+END $$;
+
+-- ============================================================================
+-- TABLAS DEL DOMINIO: AGENDA Y CITAS
+-- ============================================================================
+
+CREATE TABLE agenda.horario_atencion (
+    id_horario BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_veterinario BIGINT NOT NULL,
+    dia_semana agenda.tipo_dia_semana NOT NULL,
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL,
+    activo BOOLEAN DEFAULT TRUE,
+    duracion_minutos INTEGER DEFAULT 60,
+    CONSTRAINT uq_veterinario_dia UNIQUE(id_veterinario, dia_semana)
+);
+
+CREATE TABLE agenda.cita (
+    id_cita BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    codigo_cita VARCHAR(20) NOT NULL UNIQUE,
+    id_mascota BIGINT NOT NULL,                      
+    id_veterinario BIGINT NOT NULL,                  
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    motivo VARCHAR(255),
+    estado agenda.tipo_estado_cita DEFAULT 'PENDIENTE',
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================================
+-- FINANZAS
+-- ============================================================================
+CREATE TABLE agenda.comprobante_pago (
+    id_comprobante BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_cita BIGINT NOT NULL UNIQUE,
+    id_cliente BIGINT NOT NULL,
+    tipo_documento agenda.tipo_comprobante NOT NULL DEFAULT 'RECIBO_INTERNO',
+    codigo_comprobante VARCHAR(50) NOT NULL UNIQUE,
+    monto_subtotal DECIMAL(10, 2) NOT NULL,
+    monto_impuesto DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    monto_total DECIMAL(10, 2) NOT NULL,
+    metodo_pago agenda.tipo_metodo_pago NOT NULL,
+    fecha_pago TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Conexiones físicas para el diagrama:
+    CONSTRAINT fk_pago_cita FOREIGN KEY (id_cita) REFERENCES agenda.cita(id_cita) ON DELETE RESTRICT
+);
+
+-- ============================================================================
+-- ÍNDICES DE OPTIMIZACIÓN (Esenciales para búsquedas y UI)
+-- ============================================================================
+CREATE INDEX idx_cita_fecha_vet ON agenda.cita(fecha, id_veterinario); 
+CREATE INDEX idx_cita_estado ON agenda.cita(estado);                  
+CREATE INDEX idx_cita_mascota ON agenda.cita(id_mascota);     
+CREATE INDEX idx_pago_cliente ON agenda.comprobante_pago(id_cliente);   
+
+CREATE INDEX idx_cita_codigo ON agenda.cita(codigo_cita);
+CREATE INDEX idx_pago_codigo ON agenda.comprobante_pago(codigo_comprobante);
