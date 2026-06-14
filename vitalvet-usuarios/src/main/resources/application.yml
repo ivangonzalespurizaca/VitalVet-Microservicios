@@ -1,16 +1,18 @@
 app:
   jwt:
-    secret: emrYvkqZeg78wQ4cTzPUrP4VmzX13AF8bxc9lqdeFs2
+    secret: ${JWT_SECRET}
 
 server:
   port: 8092
 
 spring:
+  config:
+    import: "optional:file:.env[.properties]"
   mail:
     host: smtp.gmail.com
     port: 587
-    username: clinsantar@gmail.com
-    password: ihfbciddbduvltve
+    username: ${EMAIL_USER}
+    password: ${EMAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -25,8 +27,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/vitalvet_usuarios?useSSL=false&serverTimezone=UTC
-    username: root
-    password:
+    username: ${DB_USER_MYSQL}
+    password: ${DB_PASSWORD_MYSQL}
   messages:
     basename: messages
   application:
