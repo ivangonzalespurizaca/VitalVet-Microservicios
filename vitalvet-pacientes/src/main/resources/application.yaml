@@ -1,9 +1,11 @@
 app:
   jwt:
-    secret: emrYvkqZeg78wQ4cTzPUrP4VmzX13AF8bxc9lqdeFs2
+    secret: ${JWT_SECRET}
 server:
   port: 8093
 spring:
+  config:
+    import: "optional:file:.env[.properties]"
   jpa:
     database: POSTGRESQL
     hibernate:
@@ -12,8 +14,8 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/vitalvet_pacientes?currentSchema=pacientes
-    username: postgres
-    password: sql
+    username: ${DB_USER_POSTGRES}
+    password: ${DB_PASSWORD_POSTGRES}
   messages:
     basename: messages
   application:

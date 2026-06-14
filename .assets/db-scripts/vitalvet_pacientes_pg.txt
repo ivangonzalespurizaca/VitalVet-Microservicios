@@ -97,6 +97,7 @@ INSERT INTO pacientes.especie (nombre_especie, activo) VALUES
 ('Roedor', true)
 ON CONFLICT (nombre_especie) DO NOTHING;
 
+select * from pacientes.especie;
 
 -- 2. REGISTRO DE RAZAS ASOCIADAS A SUS RESPECTIVAS ESPECIES
 -- (id_especie 1 = Canino, id_especie 2 = Felino)
@@ -127,6 +128,7 @@ INSERT INTO pacientes.raza (id_especie, nombre_raza, activo) VALUES
 (4, 'Cobaya / Cuy', true)
 ON CONFLICT (id_especie, nombre_raza) DO NOTHING;
 
+select * from pacientes.raza;
 
 -- 3. REGISTRO DEL CATÁLOGO BASE DE VACUNAS VETERINARIAS
 INSERT INTO pacientes.vacuna (nombre_vacuna, descripcion, activo) VALUES
@@ -138,6 +140,7 @@ INSERT INTO pacientes.vacuna (nombre_vacuna, descripcion, activo) VALUES
 ('Leucemia Felina', 'Protege contra el virus de la Leucemia Felina (FeLV), altamente recomendado para gatos con acceso al exterior.', true)
 ON CONFLICT (nombre_vacuna) DO NOTHING;
 
+select * from pacientes.vacuna;
 
 -- ============================================================================
 -- DATA SEED: REGISTROS DE PRUEBA OPERACIONALES (Mascotas y Consultas iniciales)

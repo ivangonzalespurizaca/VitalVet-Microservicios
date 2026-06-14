@@ -1,3 +1,5 @@
+dotenv:
+  filename: ../.env
 server:
   port: 8094
 spring:
@@ -9,8 +11,8 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/vitalvet_agenda?currentSchema=agenda
-    username: postgres
-    password: sql
+    username: ${DB_USER_POSTGRES}
+    password: ${DB_PASSWORD_POSTGRES}
   messages:
     basename: messages
   application:
