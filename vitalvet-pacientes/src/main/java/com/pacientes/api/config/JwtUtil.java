@@ -15,8 +15,6 @@ public class JwtUtil {
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    private final long JWT_EXPIRATION_MS = 7200000;
-
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }

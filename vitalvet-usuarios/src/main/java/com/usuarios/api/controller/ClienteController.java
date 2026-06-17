@@ -3,6 +3,7 @@ package com.usuarios.api.controller;
 import com.usuarios.api.client.PacienteClient;
 import com.usuarios.api.dto.*;
 import com.usuarios.api.entity.Persona;
+import com.usuarios.api.http.response.ClienteResponse;
 import com.usuarios.api.mapper.PersonaMapper;
 import com.usuarios.api.services.AuthService;
 import com.usuarios.api.services.PersonaService;
@@ -37,12 +38,12 @@ public class ClienteController {
 
     @GetMapping("/listar")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO')")
-    public ResponseEntity<ApiResponse<List<ClienteResponseDTO>>> listarClientes(
+    public ResponseEntity<ApiResponse<List<ClienteResponse>>> listarClientes(
             @RequestParam(value = "criterio", required = false) String criterio) {
 
-        List<ClienteResponseDTO> listaDTO = personaService.buscarClientesPorFiltro(criterio).stream()
+        List<ClienteResponse> listaDTO = personaService.buscarClientesPorFiltro(criterio).stream()
                 .map(persona -> {
-                    ClienteResponseDTO dto = personaMapper.toClienteResponseDTO(persona);
+                    ClienteResponse dto = personaMapper.toClienteResponseDTO(persona);
                     dto.setTotalMascotas(personaService.obtenerTotalMascotas(persona.getIdPersona()));
                     return dto;
                 }).toList();
@@ -55,10 +56,10 @@ public class ClienteController {
     @PostMapping("/registro-rapido")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO')")
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<ApiResponse<ClienteResponseDTO>> registroRapidoMostrador(@Valid @RequestBody RegistroRapidoDTO request) throws Exception {
+    public ResponseEntity<ApiResponse<ClienteResponse>> registroRapidoMostrador(@Valid @RequestBody RegistroRapidoDTO request) throws Exception {
 
         Persona clienteGuardado = authService.registrarCliente(request.getDatosCliente());
-        ClienteResponseDTO clienteResponseDTO = personaMapper.toClienteResponseDTO(clienteGuardado);
+        ClienteResponse clienteResponseDTO = personaMapper.toClienteResponseDTO(clienteGuardado);
 
         MascotaRequestDTO mascotaDTO = request.getDatosMascota();
         mascotaDTO.setIdCliente(clienteGuardado.getIdPersona());
@@ -77,7 +78,7 @@ public class ClienteController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO')")
-    public ResponseEntity<ApiResponse<ClienteResponseDTO>> obtenerPorId(
+    public ResponseEntity<ApiResponse<ClienteResponse>> obtenerPorId(
             @PathVariable("id") Long id) throws Exception {
 
         Persona cliente = personaService.buscarPorId(id);
@@ -85,12 +86,28 @@ public class ClienteController {
             throw new ModeloNotFoundException("Cliente con código " + id + " no encontrado");
         }
 
-        ClienteResponseDTO responseDTO = personaMapper.toClienteResponseDTO(cliente);
+        ClienteResponse responseDTO = personaMapper.toClienteResponseDTO(cliente);
         responseDTO.setTotalMascotas(personaService.obtenerTotalMascotas(id));
 
         return ResponseEntity.ok(new ApiResponse<>(
                 true, "¡Datos del cliente recuperados con éxito!", responseDTO
         ));
+    }
+
+    @GetMapping("/interno/{id}")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<?> obtenerPorIdInterno(
+            @PathVariable("id") Long id) throws Exception {
+
+        Persona cliente = personaService.buscarPorId(id);
+        if (cliente == null) {
+            throw new ModeloNotFoundException("Cliente con código " + id + " no encontrado");
+        }
+
+        ClienteResponse responseDTO = personaMapper.toClienteResponseDTO(cliente);
+        responseDTO.setTotalMascotas(personaService.obtenerTotalMascotas(id));
+
+        return ResponseEntity.ok(responseDTO);
     }
 
     @PutMapping("/editar/{id}")

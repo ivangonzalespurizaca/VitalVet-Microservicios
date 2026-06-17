@@ -50,7 +50,7 @@ public class MascotaController {
     }
 
     @GetMapping("/{idMascota}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE')")
     public ResponseEntity<ApiResponse<MascotaResponseDTO>> obtenerPorId(
             @PathVariable("idMascota") Long idMascota) throws Exception {
 
@@ -65,6 +65,20 @@ public class MascotaController {
         ));
     }
 
+    @GetMapping("/interno/{idMascota}")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<?> obtenerPorIdInterno(
+            @PathVariable("idMascota") Long idMascota) throws Exception {
+
+        Mascota mascota = mascotaService.buscarPorId(idMascota);
+        if (mascota == null) {
+            throw new ModeloNotFoundException("Mascota con código " + idMascota + " no encontrada");
+        }
+        MascotaResponseDTO responseDTO = mascotaMapper.toResponseDTO(mascota);
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
     @GetMapping("/contar/{idCliente}")
     public ResponseEntity<Integer> contarMascotasPorCliente(@PathVariable("idCliente") Long idCliente) {
         int total = mascotaService.contarPorIdCliente(idCliente);
@@ -72,7 +86,7 @@ public class MascotaController {
     }
 
     @GetMapping("/cliente/{idCliente}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE')")
     public ResponseEntity<ApiResponse<List<MascotaResponseDTO>>> listarPorCliente(@PathVariable("idCliente") Long idCliente) {
 
         List<Mascota> listaEntidades = mascotaService.listarMascotasPorCliente(idCliente);

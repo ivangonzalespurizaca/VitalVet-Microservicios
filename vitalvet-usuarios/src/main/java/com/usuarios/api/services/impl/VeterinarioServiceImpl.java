@@ -1,5 +1,6 @@
 package com.usuarios.api.services.impl;
 
+import com.usuarios.api.dto.VeterinarioHeaderDTO;
 import com.usuarios.api.dto.VeterinarioRequestDTO;
 import com.usuarios.api.entity.Especialidad;
 import com.usuarios.api.entity.Persona;
@@ -131,4 +132,31 @@ public class VeterinarioServiceImpl extends ICRUDImpl<Veterinario, Long> impleme
         return veterinarioRepository.save(veterinarioExistente);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void desactivarVeterinario(Long idVeterinario) {
+        Veterinario veterinario = veterinarioRepository.findById(idVeterinario)
+                .orElseThrow(() -> new BusinessException("El veterinario con el ID " + idVeterinario + " no existe."));
+
+        Persona persona = veterinario.getPersona();
+
+        persona.setActivo(false);
+
+        personaRepository.save(persona);
+        veterinarioRepository.save(veterinario);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void activarVeterinario(Long idVeterinario) {
+        Veterinario veterinario = veterinarioRepository.findById(idVeterinario)
+                .orElseThrow(() -> new BusinessException("El veterinario con el ID " + idVeterinario + " no existe."));
+
+        Persona persona = veterinario.getPersona();
+
+        persona.setActivo(true);
+
+        personaRepository.save(persona);
+        veterinarioRepository.save(veterinario);
+    }
 }

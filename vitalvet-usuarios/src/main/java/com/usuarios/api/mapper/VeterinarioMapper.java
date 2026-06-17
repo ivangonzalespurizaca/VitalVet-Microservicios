@@ -1,5 +1,6 @@
 package com.usuarios.api.mapper;
 
+import com.usuarios.api.dto.VeterinarioHeaderDTO;
 import com.usuarios.api.dto.VeterinarioRequestDTO;
 import com.usuarios.api.dto.VeterinarioResponseDTO;
 import com.usuarios.api.entity.Persona;
@@ -49,4 +50,10 @@ public interface VeterinarioMapper {
     @Mapping(target = "persona", ignore = true)
     @Mapping(target = "especialidad", ignore = true)
     void updateVeterinarioFromDto(VeterinarioRequestDTO dto, @MappingTarget Veterinario veterinario);
+
+
+    @Mapping(target = "dni", source = "persona.dni")
+    @Mapping(target = "nombreCompleto", expression = "java(veterinario.getPersona().getNombres() + \" \" + veterinario.getPersona().getApellidos())")
+    @Mapping(target = "especialidad", expression = "java(veterinario.getEspecialidad() != null ? veterinario.getEspecialidad().getNombreEspecialidad() : \"GENERAL\")")
+    VeterinarioHeaderDTO toHeaderDTO(Veterinario veterinario);
 }

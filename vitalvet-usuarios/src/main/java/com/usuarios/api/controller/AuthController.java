@@ -3,6 +3,7 @@ package com.usuarios.api.controller;
 import com.usuarios.api.client.PacienteClient;
 import com.usuarios.api.dto.*;
 import com.usuarios.api.entity.Persona;
+import com.usuarios.api.http.response.ClienteResponse;
 import com.usuarios.api.mapper.PersonaMapper;
 import com.usuarios.api.services.AuthService;
 import com.usuarios.api.services.PersonaService;
@@ -47,11 +48,11 @@ public class AuthController {
 
     @PostMapping("/registrar/web")
     @Transactional(rollbackFor = Exception.class)
-    public ResponseEntity<ApiResponse<ClienteResponseDTO>> registrarDesdeWeb(@Valid @RequestBody RegistroWebDTO request) {
+    public ResponseEntity<ApiResponse<?>> registrarDesdeWeb(@Valid @RequestBody RegistroWebDTO request) {
 
         Persona clienteCreado = authService.registrarCliente(request.getDatosCliente());
 
-        ClienteResponseDTO clienteResponseDTO = personaMapper.toClienteResponseDTO(clienteCreado);
+        ClienteResponse clienteResponseDTO = personaMapper.toClienteResponseDTO(clienteCreado);
         clienteResponseDTO.setEmail(request.getDatosCliente().getEmail());
 
         MascotaRequestDTO mascotaDTO = request.getDatosMascota();

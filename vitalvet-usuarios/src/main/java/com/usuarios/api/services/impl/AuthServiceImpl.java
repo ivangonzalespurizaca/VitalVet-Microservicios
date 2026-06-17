@@ -53,6 +53,12 @@ public class AuthServiceImpl implements AuthService {
         Usuario usuario = usuarioRepository.findByEmail(loginRequestDTO.getEmail())
                 .orElseThrow(() -> new BadCredentialsException("Credenciales incorrectas (Email no encontrado)"));
 
+        if (Boolean.FALSE.equals(usuario.getPersona().getActivo())) {
+            throw new org.springframework.security.authentication.DisabledException(
+                    "Su cuenta se encuentra desactivada. No puede ingresar al sistema."
+            );
+        }
+
         if (!passwordEncoder.matches(loginRequestDTO.getContrasenia(), usuario.getContrasenia())) {
             throw new BadCredentialsException("Credenciales incorrectas (Contraseña inválida)");
         }

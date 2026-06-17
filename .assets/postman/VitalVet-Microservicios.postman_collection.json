@@ -99,7 +99,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "/*{\r\n    \"email\" : \"jorge.perez@gmail.com\",\r\n    \"contrasenia\" : \"cliente123\"\r\n}*/\r\n/*\r\n{\r\n    \"email\" : \"veterinario@gmail.com\",\r\n    \"contrasenia\" : \"77777777\"\r\n}\r\n*/\r\n\r\n{\r\n    \"email\" : \"ivangonzalespurizaca@gmail.com\",\r\n    \"contrasenia\" : \"admin1\"\r\n}\r\n",
+                  "raw": "{\r\n    \"email\" : \"jorge.perez@gmail.com\",\r\n    \"contrasenia\" : \"cliente123\"\r\n}\r\n/*\r\n{\r\n    \"email\" : \"ana.gomez@vitalvet.com\",\r\n    \"contrasenia\" : \"vet123\"\r\n}*/\r\n/*\r\n{\r\n    \"email\" : \"ivangonzalespurizaca@gmail.com\",\r\n    \"contrasenia\" : \"admin123\"\r\n}*/\r\n",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -586,6 +586,72 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "Desactivar Cuenta Veterinario",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8091/api/usuario/veterinario/desactivar/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8091",
+                  "path": [
+                    "api",
+                    "usuario",
+                    "veterinario",
+                    "desactivar",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Activar Cuenta Veterinario",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8091/api/usuario/veterinario/activar/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8091",
+                  "path": [
+                    "api",
+                    "usuario",
+                    "veterinario",
+                    "activar",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         }
@@ -614,7 +680,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n  \"nombreMascota\": \"Firulais\",\r\n  \"idRaza\": 1,\r\n  \"sexo\": \"MACHO\",\r\n  \"fechaNacimiento\": \"2024-03-15\",\r\n  \"idCliente\": 4,\r\n  \"pesoActual\": 30.0,\r\n  \"fotoUrl\": \"https://res.cloudinary.com/dfid8iuf3/image/upload/v1777487085/Beagle-1_g7rnpp.webp\"\r\n}",
+                  "raw": "{\r\n  \"nombreMascota\": \"Firulais\",\r\n  \"idRaza\": 1,\r\n  \"sexo\": \"MACHO\",\r\n  \"fechaNacimiento\": \"2024-03-15\",\r\n  \"idCliente\": 3,\r\n  \"pesoActual\": 30.0,\r\n  \"fotoUrl\": \"https://res.cloudinary.com/dfid8iuf3/image/upload/v1777487085/Beagle-1_g7rnpp.webp\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -747,6 +813,361 @@
                     "paciente",
                     "mascota",
                     "2"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Consulta",
+          "item": [
+            {
+              "name": "Consultar por ID Cita",
+              "request": {
+                "method": "GET",
+                "header": []
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Api-Agenda",
+      "item": [
+        {
+          "name": "Cita",
+          "item": [
+            {
+              "name": "Registrar Cita",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"idMascota\": 1,\r\n    \"idVeterinario\": 1,\r\n    \"fecha\": \"2026-06-25\",\r\n    \"hora\": \"08:00:00\",\r\n    \"motivo\": \"Chequeo general y vacunas anuales de Luna.\",\r\n    \"idCliente\": 3,\r\n    \"tipoDocumento\": \"RECIBO_INTERNO\", \r\n    \"metodoPago\": \"TARJETA_CREDITO\",\r\n    \"montoTotal\": 80.00\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8094/api/agenda/cita/registrar",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8094",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "cita",
+                    "registrar"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar Citas",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8091/api/agenda/cita/panel",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8091",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "cita",
+                    "panel"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Consultar Cita por ID",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8091/api/agenda/cita/detalle/3",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8091",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "cita",
+                    "detalle",
+                    "3"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar por Slots Disponibles Por Fecha",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8094/api/agenda/cita/slots?idVeterinario=1&fecha=2026-06-25",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8094",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "cita",
+                    "slots"
+                  ],
+                  "query": [
+                    {
+                      "key": "idVeterinario",
+                      "value": "1"
+                    },
+                    {
+                      "key": "fecha",
+                      "value": "2026-06-25"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Horarios",
+          "item": [
+            {
+              "name": "Buscar Horarios por ID Veterinario",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8094/api/agenda/horario/veterinario/5",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8094",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "horario",
+                    "veterinario",
+                    "5"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Registrar Horario",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"idVeterinario\": 5,\r\n  \"diaSemana\": \"LUNES\",\r\n  \"horaInicio\": \"08:00:00\",\r\n  \"horaFin\": \"15:00:00\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8091/api/agenda/horario",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8091",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "horario"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Eliminar Horario",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"idVeterinario\": 1,\r\n  \"diaSemana\": \"DOMINGO\",\r\n  \"horaInicio\": \"13:00:00\",\r\n  \"horaFin\": \"15:00:00\"\r\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:8091/api/agenda/horario/1",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8091",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "horario",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Comprobantes de Pago",
+          "item": [
+            {
+              "name": "Listar Comprobantes",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8091/api/agenda/comprobantes/historial",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8091",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "comprobantes",
+                    "historial"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar Comprobantes (Cliente)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8091/api/agenda/comprobantes/mis-comprobantes/4",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8091",
+                  "path": [
+                    "api",
+                    "agenda",
+                    "comprobantes",
+                    "mis-comprobantes",
+                    "4"
                   ]
                 }
               },

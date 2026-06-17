@@ -1,11 +1,11 @@
 package com.usuarios.api.mapper;
 
-import com.usuarios.api.dto.ClienteResponseDTO;
 import com.usuarios.api.dto.PerfilRequestDTO;
 import com.usuarios.api.dto.PerfilResponseDTO;
 import com.usuarios.api.dto.PersonaRequestDTO;
 import com.usuarios.api.entity.Persona;
 import com.usuarios.api.entity.Usuario;
+import com.usuarios.api.http.response.ClienteResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -27,7 +27,7 @@ public interface PersonaMapper {
 
     @Mapping(target = "totalMascotas", ignore = true)
     @Mapping(target = "email", source = "persona", qualifiedByName = "mapearEmailSeguro")
-    ClienteResponseDTO toClienteResponseDTO(Persona persona);
+    ClienteResponse toClienteResponseDTO(Persona persona);
 
     @Named("mapearEmailSeguro")
     default String mapearEmailSeguro(Persona persona) {

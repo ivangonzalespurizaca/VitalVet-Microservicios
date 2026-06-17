@@ -1,8 +1,11 @@
-dotenv:
-  filename: ../.env
+app:
+  jwt:
+    secret: ${JWT_SECRET}
 server:
   port: 8094
 spring:
+  config:
+    import: "optional:file:.env[.properties]"
   jpa:
     database: POSTGRESQL
     hibernate:

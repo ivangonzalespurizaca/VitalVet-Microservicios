@@ -1,4 +1,4 @@
-package com.usuarios.api.dto;
+package com.agenda.api.dto;
 
 import lombok.Data;
 

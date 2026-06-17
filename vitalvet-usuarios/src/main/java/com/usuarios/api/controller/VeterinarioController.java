@@ -96,4 +96,36 @@ public class VeterinarioController {
         ));
     }
 
+    @DeleteMapping("/desactivar/{idVeterinario}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponse<Void>> desactivarVeterinario(
+            @PathVariable("idVeterinario") Long idVeterinario) throws Exception {
+
+        vService.desactivarVeterinario(idVeterinario);
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                true, "¡La cuenta del veterinario ha sido desactivada con éxito!", null
+        ));
+    }
+
+    @PatchMapping("/activar/{idVeterinario}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponse<Void>> activarVeterinario(
+            @PathVariable("idVeterinario") Long idVeterinario) throws Exception {
+
+        vService.activarVeterinario(idVeterinario);
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                true, "¡La cuenta del veterinario ha sido reactivada con éxito!", null
+        ));
+    }
+
+    @GetMapping("/cabecera/{id}")
+    public ResponseEntity<?> obtenerCabecera(@PathVariable Long id) throws Exception{
+        Veterinario veterinario = vService.buscarPorId(id);
+        if(veterinario==null){
+            throw new ModeloNotFoundException("El veterinario con ID: " + id + " no existe");
+        }
+        return ResponseEntity.ok(vMapper.toHeaderDTO(veterinario));
+    }
 }
