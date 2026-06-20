@@ -32,6 +32,16 @@ public class VacunaController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Catálogo de vacunas recuperado con éxito.", lista));
     }
 
+    @GetMapping("/listar-activos")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE')")
+    public ResponseEntity<ApiResponse<List<VacunaDTO>>> listarVacunasActivas() throws Exception {
+        List<VacunaDTO> lista = service.listar().stream().filter(e -> Boolean.TRUE.equals(e.getActivo()))
+                .map(v -> new VacunaDTO(v.getIdVacuna(), v.getNombreVacuna(), v.getDescripcion(), v.getActivo()))
+                .toList();
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "Catálogo de vacunas recuperado con éxito.", lista));
+    }
+
     @PostMapping("/registrar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<ApiResponse<VacunaDTO>> registrar(@Valid @RequestBody VacunaDTO dto) throws Exception {

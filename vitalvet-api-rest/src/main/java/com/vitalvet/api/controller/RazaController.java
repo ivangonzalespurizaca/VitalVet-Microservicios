@@ -42,6 +42,20 @@ public class RazaController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Catálogo de razas recuperado con éxito.", lista));
     }
 
+    @GetMapping("/listar-activos")
+    public ResponseEntity<ApiResponse<List<RazaDTO>>> listarRazasActivas() throws Exception {
+        List<RazaDTO> lista = service.listar().stream().filter(e -> Boolean.TRUE.equals(e.getActivo()))
+                .map(r -> new RazaDTO(
+                        r.getIdRaza(),
+                        r.getNombreRaza(),
+                        r.getEspecie().getIdEspecie(),
+                        r.getEspecie().getNombreEspecie(),
+                        r.getActivo()))
+                .toList();
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "Catálogo de razas recuperado con éxito.", lista));
+    }
+
     @PostMapping("/registrar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<ApiResponse<RazaDTO>> registrar(@Valid @RequestBody RazaDTO dto) throws Exception {

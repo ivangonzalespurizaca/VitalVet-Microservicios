@@ -30,6 +30,16 @@ public class EspecialidadController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Catálogo de especialidades recuperado.", lista));
     }
 
+    @GetMapping("/listar-activos")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE')")
+    public ResponseEntity<ApiResponse<List<EspecialidadDTO>>> listarEspecialidadesActivas() throws Exception {
+        List<EspecialidadDTO> lista = service.listar().stream().filter(e -> Boolean.TRUE.equals(e.getActivo()))
+                .map(e -> new EspecialidadDTO(e.getIdEspecialidad(), e.getNombreEspecialidad(), e.getActivo()))
+                .toList();
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "Catálogo de especialidades recuperado.", lista));
+    }
+
     @PostMapping("/registrar")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<ApiResponse<EspecialidadDTO>> registrar(@Valid @RequestBody EspecialidadDTO dto) throws Exception {

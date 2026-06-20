@@ -7,6 +7,7 @@ import com.vitalvet.api.utils.ApiResponse;
 import com.vitalvet.api.utils.BusinessException;
 import com.vitalvet.api.utils.ModeloNotFoundException;
 import jakarta.validation.Valid;
+import org.hibernate.type.TrueFalseConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,15 @@ public class EspecieController {
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<ApiResponse<List<EspecieDTO>>> listarEspecies() throws Exception {
         List<EspecieDTO> lista = service.listar().stream()
+                .map(e -> new EspecieDTO(e.getIdEspecie(), e.getNombreEspecie(), e.getActivo()))
+                .toList();
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "Catálogo de especies recuperado.", lista));
+    }
+
+    @GetMapping("/listar-activos")
+    public ResponseEntity<ApiResponse<List<EspecieDTO>>> listarEspeciesActivas() throws Exception {
+        List<EspecieDTO> lista = service.listar().stream().filter(e -> Boolean.TRUE.equals(e.getActivo()))
                 .map(e -> new EspecieDTO(e.getIdEspecie(), e.getNombreEspecie(), e.getActivo()))
                 .toList();
 
