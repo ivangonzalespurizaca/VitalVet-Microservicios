@@ -19,9 +19,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/pacientes?currentSchema=pacientes
+    url: jdbc:postgresql://localhost:5432/vitalvet_db?currentSchema=pacientes
     username: ${DB_USER_POSTGRES}
-    password: admin
+    password: sql
 
   messages:
     basename: messages
