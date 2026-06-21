@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://example.com/veterinaria-vitalvet/comentarios"
+	xmlns:tns="http://example.com/veterinaria-vitalvet/comentarios"
+	elementFormDefault="qualified">
+
+
+	<xsd:complexType name="comentario">
+		<xsd:sequence>
+			<xsd:element name="id_coment" type="xsd:int"/>
+			<xsd:element name="nombreVeterinario" type="xsd:string"/>
+			<xsd:element name="opinion" type="xsd:string"/>
+			<xsd:element name="estrellas" type="xsd:int"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:element name="getComentarioRequest">
+		<xsd:complexType>
+
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="getComentarioResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="salida" type="tns:comentario" maxOccurs="2"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+
+
+
+	<xsd:element name="postComentarioRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="bean" type="tns:comentario"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="postComentarioResponse">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="salida" type="xsd:int"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+
+
+
+
+	
+</xsd:schema>
