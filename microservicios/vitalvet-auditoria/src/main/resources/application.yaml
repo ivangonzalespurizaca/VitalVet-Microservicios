@@ -1,10 +1,18 @@
 server:
   port: 8095
 spring:
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    consumer:
+      group-id: auditoria-grupo-limpio-final
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   data:
     mongodb:
-      uri: mongodb://localhost:27017/vitalvet_auditoria
       auto-index-creation: true
+  mongodb:
+    uri: mongodb+srv://jhonramos3456_db_user:admin@cluster0.pdcbohm.mongodb.net/vitalvet_auditoria?retryWrites=true&w=majority
   messages:
     basename: messages
   application:
@@ -15,3 +23,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    org.springframework.kafka: DEBUG

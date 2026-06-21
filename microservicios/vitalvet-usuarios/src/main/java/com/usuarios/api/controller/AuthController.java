@@ -4,6 +4,8 @@ import com.usuarios.api.client.PacienteClient;
 import com.usuarios.api.dto.*;
 import com.usuarios.api.entity.Persona;
 import com.usuarios.api.http.response.ClienteResponse;
+import com.usuarios.api.kafka.event.AuditoriaEvent;
+import com.usuarios.api.kafka.producer.AuditoriaProducer;
 import com.usuarios.api.mapper.PersonaMapper;
 import com.usuarios.api.services.AuthService;
 import com.usuarios.api.services.PersonaService;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
@@ -36,6 +39,9 @@ public class AuthController {
 
     @Autowired
     private PacienteClient pacienteClient;
+
+    @Autowired
+    private AuditoriaProducer producer;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
@@ -60,6 +66,17 @@ public class AuthController {
 
         try {
             pacienteClient.registrarMascotaPublicoInterno(mascotaDTO);
+
+
+            AuditoriaEvent eventoAuditoria = new AuditoriaEvent(
+                    "REGISTRO",
+                    "MASCOTAS",
+                    clienteResponseDTO.getIdPersona(),
+                    "Se registró exitosamente la mascota: " + mascotaDTO.getNombreMascota(),
+                    LocalDateTime.now()
+            );
+            producer.enviar(eventoAuditoria);
+
             clienteResponseDTO.setTotalMascotas(1);
         } catch (Exception e) {
             throw new RuntimeException("Error en el registro distribuido del paciente clínico: " + e.getMessage());
