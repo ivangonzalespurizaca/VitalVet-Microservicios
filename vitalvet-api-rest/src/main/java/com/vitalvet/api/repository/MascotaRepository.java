@@ -24,4 +24,7 @@ public interface MascotaRepository extends JpaRepository<Mascota, Long> {
     @Transactional // Garantiza que la mutación se ejecute de forma segura en la BD
     @Query("UPDATE Mascota m SET m.pesoActual = :peso WHERE m.idMascota = :idMascota")
     void actualizarPesoMascota(@Param("idMascota") Long idMascota, @Param("peso") BigDecimal peso);
+
+    Long countByActivoTrue();
+
 }

@@ -2,22 +2,29 @@ package com.vitalvet.api.services.impl;
 
 import com.vitalvet.api.client.AgendaClient;
 import com.vitalvet.api.dto.ConsultaRequestDTO;
+import com.vitalvet.api.dto.ConsultaResumenDTO;
 import com.vitalvet.api.dto.VacunaAplicadaDTO;
 import com.vitalvet.api.entity.Consulta;
+import com.vitalvet.api.entity.Mascota;
 import com.vitalvet.api.entity.Vacuna;
 import com.vitalvet.api.entity.VacunaAplicada;
 import com.vitalvet.api.entity.enums.EstadoVacuna;
 import com.vitalvet.api.repository.ConsultaRepository;
 import com.vitalvet.api.repository.MascotaRepository;
 import com.vitalvet.api.repository.VacunaAplicadaRepository;
+import com.vitalvet.api.repository.VacunaRepository;
 import com.vitalvet.api.services.ConsultaService;
 import com.vitalvet.api.utils.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ConsultaServiceImpl extends ICRUDImpl<Consulta, Long> implements ConsultaService{
@@ -27,6 +34,9 @@ public class ConsultaServiceImpl extends ICRUDImpl<Consulta, Long> implements Co
 
     @Autowired
     private VacunaAplicadaRepository vacunaAplicadaRepository;
+
+    @Autowired
+    private VacunaRepository vacunaRepository;
 
     @Autowired
     private MascotaRepository mascotaRepository;
@@ -62,22 +72,35 @@ public class ConsultaServiceImpl extends ICRUDImpl<Consulta, Long> implements Co
         Consulta consultaGuardada = consultaRepository.save(consulta);
 
         if (dto.getVacunas() != null && !dto.getVacunas().isEmpty()) {
+            LocalDate hoy = LocalDate.now();
+
+
             for (VacunaAplicadaDTO vDto : dto.getVacunas()) {
                 VacunaAplicada vacunaAplicada = new VacunaAplicada();
-                vacunaAplicada.setFechaAplicacion(LocalDate.now());
-                vacunaAplicada.setProximaDosis(vDto.getProximaDosis());
+
+                LocalDate fechaInput = (vDto.getProximaDosis() != null) ? vDto.getProximaDosis() : hoy;
+
+                if (fechaInput.isAfter(hoy)) {
+                    vacunaAplicada.setEstado(EstadoVacuna.PROGRAMADA);
+                    vacunaAplicada.setProximaDosis(fechaInput);
+                    vacunaAplicada.setFechaAplicacion(null);
+                    vacunaAplicada.setConsulta(null);
+                } else {
+                    vacunaAplicada.setEstado(EstadoVacuna.APLICADA);
+                    vacunaAplicada.setFechaAplicacion(fechaInput);
+                    vacunaAplicada.setProximaDosis(null);
+                    vacunaAplicada.setConsulta(consultaGuardada);
+                }
+
                 vacunaAplicada.setNroDosis(vDto.getNroDosis() != null ? vDto.getNroDosis() : "1ra Dosis");
-                vacunaAplicada.setEstado(EstadoVacuna.APLICADA);
 
-                com.vitalvet.api.entity.Mascota mascotaProxy = new com.vitalvet.api.entity.Mascota();
-                mascotaProxy.setIdMascota(idMascota);
-                vacunaAplicada.setMascota(mascotaProxy);
+                Mascota mascota = mascotaRepository.findById(idMascota)
+                        .orElseThrow(() -> new BusinessException("Mascota no encontrada"));
+                vacunaAplicada.setMascota(mascota);
 
-                Vacuna vacuna = new Vacuna();
-                vacuna.setIdVacuna(vDto.getIdVacuna());
+                Vacuna vacuna = vacunaRepository.findById(vDto.getIdVacuna())
+                        .orElseThrow(() -> new BusinessException("Vacuna no encontrada en catálogo"));
                 vacunaAplicada.setVacuna(vacuna);
-
-                vacunaAplicada.setConsulta(consultaGuardada);
 
                 vacunaAplicadaRepository.save(vacunaAplicada);
             }

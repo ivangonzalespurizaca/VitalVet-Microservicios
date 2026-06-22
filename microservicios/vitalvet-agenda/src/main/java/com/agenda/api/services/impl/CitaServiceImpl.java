@@ -311,6 +311,7 @@ public class CitaServiceImpl extends ICRUDImpl<Cita, Long> implements CitaServic
                         .disponible(false)
                         .idCita(infoCita.getIdCita())
                         .nombreMascota(infoCita.getNombreMascota())
+                        .dniPropietario(infoCita.getDniPropietario())
                         .razaMascota(infoCita.getRazaMascota())
                         .nombrePropietario(infoCita.getNombrePropietario())
                         .motivoConsulta(infoCita.getMotivo())

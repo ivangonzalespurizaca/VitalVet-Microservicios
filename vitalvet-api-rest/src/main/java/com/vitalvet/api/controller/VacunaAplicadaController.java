@@ -1,5 +1,6 @@
 package com.vitalvet.api.controller;
 
+import com.vitalvet.api.dto.AlertaVacunaDTO;
 import com.vitalvet.api.dto.CarnetVacunaDTO;
 import com.vitalvet.api.dto.VacunaRegistroRequestDTO;
 import com.vitalvet.api.dto.VacunaResponseDTO;
@@ -95,5 +96,14 @@ public class VacunaAplicadaController {
                 "Carnet de vacunación recuperado con éxito. Filtro: " + estado.toUpperCase(),
                 carnetCompleto
         ));
+    }
+
+    @GetMapping("/proximas/{idsMascotas}")
+    @PreAuthorize("permitAll()") // Asegurado para acceso interno según tu configuración
+    public ResponseEntity<List<AlertaVacunaDTO>> obtenerVacunasProximas(
+            @PathVariable List<Long> idsMascotas) {
+
+        List<AlertaVacunaDTO> alertas = vacunaAplicadaService.buscarVacunasProximas(idsMascotas);
+        return ResponseEntity.ok(alertas);
     }
 }

@@ -73,4 +73,9 @@ public class MascotaServiceImpl extends ICRUDImpl<Mascota, Long> implements Masc
     public boolean existePorId(Long idMascota) {
         return repo.existsById(idMascota);
     }
+
+    @Override
+    public Long contarActivos() {
+        return repo.countByActivoTrue();
+    }
 }

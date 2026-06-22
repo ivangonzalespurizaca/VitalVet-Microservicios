@@ -16,5 +16,6 @@ public class AgendaBloqueResponseDTO {
     private String nombreMascota;
     private String razaMascota;
     private String nombrePropietario;
+    private String dniPropietario;
     private String motivoConsulta;
 }

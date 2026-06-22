@@ -40,12 +40,15 @@ public class MascotaController {
 
     }
 
+    @GetMapping("/total-activos")
+    public ResponseEntity<Long> obtenerTotalPacientes() {
+        return ResponseEntity.ok(mascotaService.contarActivos());
+    }
+
     @PostMapping("/registrar")
     @PreAuthorize("hasAnyRole('CLIENTE', 'VETERINARIO')")
     public ResponseEntity<ApiResponse<MascotaResponseDTO>> registrarMascotaPrivado(@Valid @RequestBody MascotaRequestDTO dto) throws Exception {
-
         return procesarRegistroMascota(dto);
-
     }
 
     @GetMapping("/{idMascota}")
@@ -85,7 +88,7 @@ public class MascotaController {
     }
 
     @GetMapping("/cliente/{idCliente}")
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE')")
     public ResponseEntity<ApiResponse<List<MascotaResponseDTO>>> listarPorCliente(@PathVariable("idCliente") Long idCliente) {
 
         List<Mascota> listaEntidades = mascotaService.listarMascotasPorCliente(idCliente);
@@ -99,6 +102,18 @@ public class MascotaController {
                 "¡Mascotas del cliente recuperadas con éxito!",
                 listaDTO
         ));
+    }
+
+    @GetMapping("/interno/cliente/{idCliente}")
+    public ResponseEntity<?> listarPorClienteInterno(@PathVariable("idCliente") Long idCliente) {
+
+        List<Mascota> listaEntidades = mascotaService.listarMascotasPorCliente(idCliente);
+
+        List<MascotaResponseDTO> listaDTO = listaEntidades.stream()
+                .map(mascotaMapper::toResponseDTO)
+                .toList();
+
+        return ResponseEntity.ok(listaDTO);
     }
 
     @GetMapping("/mis-mascotas")

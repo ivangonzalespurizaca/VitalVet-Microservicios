@@ -80,6 +80,31 @@ spring:
               filters:
                 - AuthenticationFilter
 
+            # =========================
+            # AGENDA SERVICE (Incluyendo Dashboard)
+            # =========================
+            - id: MICRO-AGENDA-PRIVATE
+              uri: lb://MICRO-AGENDA
+              predicates:
+                - Path=/api/agenda/**
+              filters:
+                - AuthenticationFilter
+            # ==========================================
+            # PACIENTE SERVICE (PÚBLICO)
+            # ==========================================
+            - id: MICRO-PACIENTE-PUBLIC
+              uri: lb://MICRO-PACIENTE
+              predicates:
+                - Path=/api/paciente/mascota/total-activos
+
+            - id: MICRO-PACIENTE-VACUNAS
+              uri: lb://MICRO-PACIENTE
+              predicates:
+                - Path=/api/paciente/gestion-vacunas/**
+
+
+
+
 server:
   port: 8091
 eureka:

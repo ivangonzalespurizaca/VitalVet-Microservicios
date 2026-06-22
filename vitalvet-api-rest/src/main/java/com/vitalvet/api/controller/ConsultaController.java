@@ -2,7 +2,7 @@ package com.vitalvet.api.controller;
 
 import com.vitalvet.api.dto.ConsultaDetalleDTO;
 import com.vitalvet.api.dto.ConsultaRequestDTO;
-import com.vitalvet.api.dto.VacunaResponseDTO;
+import com.vitalvet.api.dto.ConsultaResumenDTO;
 import com.vitalvet.api.entity.Consulta;
 import com.vitalvet.api.mapper.ConsultaMapper;
 import com.vitalvet.api.services.ConsultaService;

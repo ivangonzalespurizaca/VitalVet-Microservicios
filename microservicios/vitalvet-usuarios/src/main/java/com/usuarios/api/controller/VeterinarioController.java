@@ -27,7 +27,7 @@ public class VeterinarioController {
     private VeterinarioMapper vMapper;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE')")
     public ResponseEntity<ApiResponse<List<VeterinarioResponseDTO>>> listar(
             @RequestParam(value = "buscar", required = false, defaultValue = "") String buscar) {
 

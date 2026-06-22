@@ -1,5 +1,6 @@
 package com.vitalvet.api.services.impl;
 
+import com.vitalvet.api.dto.AlertaVacunaDTO;
 import com.vitalvet.api.dto.CarnetVacunaDTO;
 import com.vitalvet.api.dto.VacunaRegistroRequestDTO;
 import com.vitalvet.api.dto.VacunaResponseDTO;
@@ -77,6 +78,24 @@ public class VacunaAplicadaServiceImpl extends ICRUDImpl<VacunaAplicada, Long> i
                         ? mascota.getRaza().getEspecie().getNombreEspecie() : "Sin Especie")
                 .vacunas(vacunasFiltradas)
                 .build();
+    }
+
+    @Override
+    public List<AlertaVacunaDTO> buscarVacunasProximas(List<Long> idsMascotas) {
+        LocalDate hoy = LocalDate.now();
+        LocalDate limite = hoy.plusDays(30); // Solo las que vencen en los próximos 30 días
+
+        List<VacunaAplicada> vacunas = repo.findByMascota_IdMascotaInAndProximaDosisAfter(idsMascotas, hoy);
+
+        return vacunas.stream()
+                .filter(v -> v.getProximaDosis().isBefore(limite))
+                .map(v -> AlertaVacunaDTO.builder()
+                        .nombreVacuna(v.getVacuna().getNombreVacuna())
+                        .nombreMascota(v.getMascota().getNombreMascota())
+                        .fechaVencimiento(v.getProximaDosis())
+                        .nivelAlerta("PRONTO")
+                        .build())
+                .toList();
     }
 
     @Transactional(rollbackFor = Exception.class)

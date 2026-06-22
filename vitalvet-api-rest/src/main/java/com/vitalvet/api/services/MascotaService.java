@@ -10,4 +10,5 @@ public interface MascotaService extends ICRUD<Mascota, Long> {
     List<Mascota> listarMascotasPorCliente(Long idCliente);
     MascotasResponse listarMascotasPorDniCliente(String dni);
     boolean existePorId(Long idMascota);
+    Long contarActivos();
 }

@@ -48,4 +48,22 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     Long countByIdMascotaAndEstado(Long idMascota, TipoEstadoCita estado);
 
     Long countByFecha(LocalDate fecha);
+
+    @Query("SELECT c.estado, COUNT(c) FROM Cita c GROUP BY c.estado")
+    List<Object[]> contarCitasPorEstadoRaw();
+
+    // 1. Contar pacientes en espera (Citas para hoy con estado 'ESPERA')
+    Long countByFechaAndIdVeterinarioAndEstado(LocalDate fecha, Long idVeterinario, TipoEstadoCita estado);
+
+    // 3. Proximas citas (Lista para la agenda rápida)
+    List<Cita> findByFechaAndIdVeterinarioOrderByHoraAsc(LocalDate fecha, Long idVeterinario);
+
+
+        // Cambia esto a solo buscar por lista de mascotas
+        @Query("SELECT c FROM Cita c WHERE c.idMascota IN :idsMascotas AND c.fecha >= CURRENT_DATE() ORDER BY c.fecha ASC, c.hora ASC")
+        List<Cita> findProximasCitasPorMascotas(@Param("idsMascotas") List<Long> idsMascotas);
+
+
+
+
 }
