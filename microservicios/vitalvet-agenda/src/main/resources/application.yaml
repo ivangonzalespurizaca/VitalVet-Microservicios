@@ -4,6 +4,8 @@ app:
 server:
   port: 8094
 spring:
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
   config:
     import: "optional:file:.env[.properties]"
   jpa:

@@ -1,18 +1,23 @@
-package com.auditoria.api.event;
+package com.agenda.api.kafka.event;
+
 
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.time.LocalDateTime;
 
+
+@AllArgsConstructor
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class AuditoriaEvent {
     private String accion;
     private String modulo;
     private LocalDateTime fecha;
     private Object data;
+
+
 }

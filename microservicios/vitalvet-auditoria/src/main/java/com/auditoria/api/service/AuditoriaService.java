@@ -25,7 +25,7 @@ public class AuditoriaService {
     private MongoTemplate mongoTemplate;
 
 
-    //listan para las apis
+
     public List<AuditoriaDocument>listar(){
         return repository.findAll();
     }
