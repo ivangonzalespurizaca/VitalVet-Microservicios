@@ -6,7 +6,11 @@ import com.agenda.api.dto.HorarioDetalleDTO;
 import com.agenda.api.dto.HorarioRequestDTO;
 import com.agenda.api.entity.HorarioAtencion;
 import com.agenda.api.http.response.HorarioResponse;
+import com.agenda.api.kafka.event.AuditoriaEvent;
+import com.agenda.api.kafka.producer.AuditoriaProducer;
 import com.agenda.api.mapper.HorarioMapper;
+import com.agenda.api.record.CitaClient;
+import com.agenda.api.record.HorarioR;
 import com.agenda.api.services.CitaService;
 import com.agenda.api.services.HorarioAtencionService;
 import com.agenda.api.utils.ApiResponse;
@@ -22,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -39,6 +44,8 @@ public class HorarioAtencionController {
 
     @Autowired
     private CitaService citaService;
+    @Autowired
+    private AuditoriaProducer producer;
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE')")
     @GetMapping("/veterinario/{idVeterinario}")
@@ -80,6 +87,14 @@ public class HorarioAtencionController {
         nuevoHorario.setDuracionMinutos(60);
         horarioService.registrar(nuevoHorario);
         HorarioDetalleDTO horarioDetalleDTO = horarioMapper.toDetalleDTO(nuevoHorario);
+
+        AuditoriaEvent eventoAuditoria = new AuditoriaEvent(
+                "REGISTRO",
+                "HORARIO",
+                LocalDateTime.now(),
+                new HorarioR(horarioDetalleDTO.getIdHorario(),requestDTO.getIdVeterinario())
+        );
+        producer.enviar(eventoAuditoria);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(
                 true, "¡El nuevo turno de atención ha sido registrado con éxito!", horarioDetalleDTO

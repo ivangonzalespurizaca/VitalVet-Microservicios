@@ -4,7 +4,10 @@ import com.usuarios.api.client.PacienteClient;
 import com.usuarios.api.dto.*;
 import com.usuarios.api.entity.Persona;
 import com.usuarios.api.http.response.ClienteResponse;
+import com.usuarios.api.kafka.event.AuditoriaEvent;
+import com.usuarios.api.kafka.producer.AuditoriaProducer;
 import com.usuarios.api.mapper.PersonaMapper;
+import com.usuarios.api.record.DatosClient;
 import com.usuarios.api.services.AuthService;
 import com.usuarios.api.services.PersonaService;
 import com.usuarios.api.utils.ApiResponse;
@@ -18,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -35,6 +39,9 @@ public class ClienteController {
 
     @Autowired
     private PacienteClient pacienteClient;
+
+    @Autowired
+    private AuditoriaProducer producer;
 
     @GetMapping("/listar")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO')")
@@ -126,6 +133,14 @@ public class ClienteController {
         }
 
         personaMapper.updatePersonaFromRequestDTO(dto, personaExistente);
+        AuditoriaEvent eventoAuditoria = new AuditoriaEvent(
+                "ACTUALIZACION",
+                "USUARIOS",
+                LocalDateTime.now(),
+                new DatosClient(personaExistente.getIdPersona(),"Se actualizo exitosamente los datos del Usuario: "+personaExistente.getDni())
+        );
+        producer.enviar(eventoAuditoria);
+
 
         Persona personaActualizada = personaService.actualizar(personaExistente);
         PerfilResponseDTO responseDTO = personaMapper.toResponseDTO(personaActualizada, personaActualizada.getUsuario());
