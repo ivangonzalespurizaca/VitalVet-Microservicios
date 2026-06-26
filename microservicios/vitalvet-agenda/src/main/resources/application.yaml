@@ -13,9 +13,9 @@ spring:
     show-sql: true
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://acela.proxy.rlwy.net:27709/vitalvet_agenda?currentSchema=agenda
+    url: jdbc:postgresql://localhost:5432/vitalvet_agenda?currentSchema=agenda
     username: ${DB_USER_POSTGRES}
-    password: ${DB_PASSWORD_POSTGRES_AGENDA}
+    password: ${DB_PASSWORD_POSTGRES}
   messages:
     basename: messages
   application:

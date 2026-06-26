@@ -17,7 +17,6 @@ public class VeterinarioRequestDTO {
     @Pattern(regexp = "^\\d{8}$", message = "El DNI debe contener exactamente 8 dígitos numéricos.")
     private String dni;
 
-    @NotBlank(message = "El número de celular es obligatorio.")
     @Pattern(regexp = "^9\\d{8}$", message = "El celular debe empezar con 9 y contener exactamente 9 dígitos.")
     private String celular;
 

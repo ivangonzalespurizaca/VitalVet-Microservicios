@@ -178,6 +178,7 @@ public class MascotaController {
 
         Mascota mascota = mascotaMapper.toEntity(dto);
         mascota.setRaza(raza);
+        mascota.setFotoUrl("https://res.cloudinary.com/dfid8iuf3/image/upload/v1782399797/depositphotos_68179249-stock-illustration-icon-pets_pga56n.webp");
 
         if (mascota.getPesoActual() == null) {
             mascota.setPesoActual(BigDecimal.ZERO);

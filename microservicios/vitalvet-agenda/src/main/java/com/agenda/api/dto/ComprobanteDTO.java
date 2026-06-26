@@ -23,4 +23,11 @@ public class ComprobanteDTO {
     private BigDecimal montoSubtotal;
     private BigDecimal montoImpuesto;
     private String dniCliente;
+    private Long idCita;
+    private String codigoCita;
+    private String motivo;
+    private Long idMascota;
+    private String nombreMascota;
+    private String especieMascota;
+    private String razaMascota;
 }
