@@ -4,6 +4,9 @@ import com.agenda.api.dto.*;
 import com.agenda.api.entity.enums.TipoEstadoCita;
 import com.agenda.api.http.response.CitaDetalleResponse;
 import com.agenda.api.http.response.CitaPanelResponse;
+import com.agenda.api.kafka.event.AuditoriaEvent;
+import com.agenda.api.kafka.producer.AuditoriaProducer;
+import com.agenda.api.record.CitaClient;
 import com.agenda.api.services.CitaService;
 import com.agenda.api.utils.ApiResponse;
 import jakarta.validation.Valid;
@@ -16,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +29,9 @@ public class CitaController {
 
     @Autowired
     private CitaService citaService;
+
+    @Autowired
+    private AuditoriaProducer producer;
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'VETERINARIO', 'CLIENTE')")
     @GetMapping("/slots")
@@ -50,6 +57,14 @@ public class CitaController {
     public ResponseEntity<ApiResponse<CitaResponseDTO>> registrarCita(
             @Valid @RequestBody CitaRequestDTO dto) {
         CitaResponseDTO responseDTO = citaService.registrarCita(dto);
+        AuditoriaEvent eventoAuditoria = new AuditoriaEvent(
+                "REGISTRO",
+                "CITAS",
+                LocalDateTime.now(),
+                new CitaClient(responseDTO.getIdCita(),responseDTO.getIdVeterinario(),responseDTO.getEstado())
+        );
+        producer.enviar(eventoAuditoria);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(
                 true,
                 "¡La cita médica ha sido agendada y su comprobante de pago fue emitido con éxito!",

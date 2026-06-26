@@ -1,8 +1,9 @@
-package com.usuarios.api.kafka.producer;
+package com.agenda.api.kafka.producer;
 
+import com.agenda.api.kafka.event.AuditoriaEvent;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.usuarios.api.kafka.event.AuditoriaEvent;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;

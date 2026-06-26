@@ -7,6 +7,7 @@ import com.usuarios.api.http.response.ClienteResponse;
 import com.usuarios.api.kafka.event.AuditoriaEvent;
 import com.usuarios.api.kafka.producer.AuditoriaProducer;
 import com.usuarios.api.mapper.PersonaMapper;
+import com.usuarios.api.record.DatosClient;
 import com.usuarios.api.services.AuthService;
 import com.usuarios.api.services.PersonaService;
 import com.usuarios.api.utils.ApiResponse;
@@ -70,10 +71,9 @@ public class AuthController {
 
             AuditoriaEvent eventoAuditoria = new AuditoriaEvent(
                     "REGISTRO",
-                    "MASCOTAS",
-                    clienteResponseDTO.getIdPersona(),
-                    "Se registró exitosamente la mascota: " + mascotaDTO.getNombreMascota(),
-                    LocalDateTime.now()
+                    "USUARIOS",
+                    LocalDateTime.now(),
+                    new DatosClient(clienteResponseDTO.getIdPersona(),"Se registró exitosamente la mascota: "+mascotaDTO.getNombreMascota())
             );
             producer.enviar(eventoAuditoria);
 
